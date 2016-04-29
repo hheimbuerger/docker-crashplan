@@ -16,10 +16,12 @@ trap 'kill "$tail_pid"; term_handler' INT QUIT KILL TERM
 
 # try to start crashplan as a foreground app
 # /etc/init.d/crashplan start
-TARGETDIR="/usr/local/crashplan"
-SRV_JAVA_OPTS="-Dfile.encoding=UTF-8 -Dapp=CrashPlanService -DappBaseName=CrashPlan -Xms20m -Xmx1024m -Dsun.net.inetaddr.ttl=300 -Dnetworkaddress.cache.ttl=300 -Dsun.net.inetaddr.negative.ttl=0 -Dnetworkaddress.cache.negative.ttl=0 -Dc42.native.md5.enabled=false -XX:+HeapDumpOnOutOfMemoryError -XX:+ShowMessageBoxOnError -XX:HeapDumpPath=/var/crashplan/dumps"
-GUI_JAVA_OPTS="-Dfile.encoding=UTF-8 -Dapp=CrashPlanDesktop -DappBaseName=CrashPlan -Xms20m -Xmx512m -Dsun.net.inetaddr.ttl=300 -Dnetworkaddress.cache.ttl=300 -Dsun.net.inetaddr.negative.ttl=0 -Dnetworkaddress.cache.negative.ttl=0 -Dc42.native.md5.enabled=false -XX:+HeapDumpOnOutOfMemoryError -XX:+ShowMessageBoxOnError -XX:HeapDumpPath=/var/crashplan/dumps"
-FULL_CP="$TARGETDIR/lib/com.backup42.desktop.jar:$TARGETDIR/lang"
+export TARGETDIR="/usr/local/crashplan"
+export SRV_JAVA_OPTS="-Dfile.encoding=UTF-8 -Dapp=CrashPlanService -DappBaseName=CrashPlan -Xms20m -Xmx512m -Dsun.net.inetaddr.ttl=300 -Dnetworkaddress.cache.ttl=300 -Dsun.net.inetaddr.negative.ttl=0 -Dnetworkaddress.cache.negative.ttl=0 -Dc42.native.md5.enabled=false -XX:+HeapDumpOnOutOfMemoryError -XX:+ShowMessageBoxOnError -XX:HeapDumpPath=/var/crashplan/dumps"
+export FULL_CP="$TARGETDIR/lib/com.backup42.desktop.jar:$TARGETDIR/lang"
+echo $JAVACOMMON > /var/crashplan/dumps/javacommon
+. /usr/local/crashplan/install.vars
+
 printenv > /var/crashplan/dumps/full_env
 cd $TARGETDIR
 nice -n 19 $JAVACOMMON $SRV_JAVA_OPTS -classpath $FULL_CP com.backup42.service.CPService > $TARGETDIR/log/engine_output.log 2> $TARGETDIR/log/engine_error.log
